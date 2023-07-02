@@ -1,25 +1,77 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { Link, Route } from "react-router-dom";
+import Shelf from "./Shelf";
+import Search from "./Search";
+import * as BooksAPI from "./BooksAPI";
+import "./App.css";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [books, setBooks] = useState([]);
+
+	useEffect(() => {
+		BooksAPI.getAll().then((allBooks) => setBooks(allBooks));
+	}, []);
+
+	const shelves = [
+		{
+			name: "Currently Reading",
+			id: "currentlyReading",
+		},
+		{
+			name: "Want to Read",
+			id: "wantToRead",
+		},
+		{
+			name: "Read",
+			id: "read",
+		},
+	];
+
+	const moveBook = (book, shelf) => {
+		const updatedBook = { ...book, shelf };
+		setBooks((prevBooks) => {
+			const newBooks = prevBooks.filter((b) => b.id !== book.id);
+			newBooks.push(updatedBook);
+			return newBooks;
+		});
+		BooksAPI.update(book, shelf);
+	};
+
+	return (
+		<div className="app">
+			<Route
+				path="/search"
+				render={() => <Search moveBook={moveBook} books={books} />}
+			/>
+
+			<Route
+				exact
+				path="/"
+				render={() => (
+					<div className="list-books">
+						<div className="list-books-title">
+							<h1>MyReads</h1>
+						</div>
+						<div className="list-books-content">
+							<div>
+								{shelves.map((shelf) => (
+									<Shelf
+										key={shelf.id}
+										shelf={shelf.name}
+										books={books.filter((book) => book.shelf === shelf.id)}
+										moveBook={moveBook}
+									/>
+								))}
+							</div>
+						</div>
+						<div className="open-search">
+							<Link to="/search">Add a book</Link>
+						</div>
+					</div>
+				)}
+			/>
+		</div>
+	);
 }
 
 export default App;

@@ -14,6 +14,10 @@ const Search = ({ moveBook, books }) => {
 		}
 
 		BooksAPI.search(query).then((results) => {
+			if (results.error) {
+				setSearchResults([]);
+				return;
+			}
 			setSearchResults(
 				results.map((result) => {
 					let bookOnShelf = books.find((book) => book.id === result.id);

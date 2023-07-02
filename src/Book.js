@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const Book = ({ book, moveBook }) => {
 	return (
@@ -19,10 +20,10 @@ const Book = ({ book, moveBook }) => {
 					></div>
 					<div className="book-shelf-changer">
 						<select
-							value={book.shelf}
-							onChange={(e) => moveBook(book, e.target.value)}
+							value={book.shelf || "none"}
+							onChange={(event) => moveBook(book, event.target.value)}
 						>
-							<option value="none" disabled>
+							<option value="move" disabled>
 								Move to...
 							</option>
 							<option value="currentlyReading">Currently Reading</option>
@@ -39,6 +40,12 @@ const Book = ({ book, moveBook }) => {
 			</div>
 		</li>
 	);
+};
+
+// propType validation
+Book.propTypes = {
+	book: PropTypes.object.isRequired,
+	moveBook: PropTypes.func.isRequired,
 };
 
 export default Book;

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import * as BooksAPI from "./BooksAPI";
 import Book from "./Book";
 import { Link } from "react-router-dom";
-
-const Search = ({ moveBook }) => {
+const Search = ({ moveBook, books }) => {
+	// Add books prop here
 	const [query, setQuery] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 
@@ -13,7 +13,15 @@ const Search = ({ moveBook }) => {
 			return;
 		}
 
-		BooksAPI.search(query).then((books) => setSearchResults(books || []));
+		BooksAPI.search(query).then((results) => {
+			setSearchResults(
+				results.map((result) => {
+					let bookOnShelf = books.find((book) => book.id === result.id);
+					result.shelf = bookOnShelf ? bookOnShelf.shelf : "none";
+					return result;
+				})
+			);
+		});
 	};
 
 	const updateQuery = (event) => {
